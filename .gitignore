@@ -24,6 +24,8 @@
 .deps
 .libs
 .vs/
+*.iobj
+*.ipdb
 Debug
 INSTALL
 Makefile
