@@ -1,3 +1,9 @@
+qmk_installer: An Windows Driver Installation library for qmk_supported USB devices
+===================================================================================
+Based on libwdi. The library is in fact a fork of libwdi, but adds some new executables and configuration files for qmk_supported devices.
+
+It can be compiled by Visual Studio 2017, read the [libwdi instructions](https://github.com/pbatard/libwdi/wiki/Compiling-and-debugging-libwdi-or-Zadig) for further details.
+
 libwdi: A Windows Driver Installation library for USB devices
 =============================================================
 
