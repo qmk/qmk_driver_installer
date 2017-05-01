@@ -141,7 +141,6 @@ int __cdecl main(int argc, char** argv) {
             r = wdi_install_driver(&dev, ext_dir, inf_name, &oid);
             oprintf("  %s\n", wdi_strerror(r));
         }
-
-        return r;
     }
+    return 0;
 }

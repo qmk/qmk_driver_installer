@@ -1,4 +1,45 @@
 # The format is
 # driver,desc,vid,pid
 # Use a comma as a separator without spaces
+# driver can be one of winusb,libusb,libusbk
 winusb,Kiibohd DFU Bootloader,1C11,B007
+libusb,ATxmega16C4,03EB,2FD8
+libusb,ATxmega32C4,03EB,2FD9
+libusb,ATxmega64C3,03EB,2FD6
+libusb,ATxmega128C3,03EB,2FD7
+libusb,ATxmega256C3,03EB,2FDA
+libusb,ATxmega384C3,03EB,2FDB
+libusb,ATxmega64A1U,03EB,2FE8
+libusb,ATxmega128A1U,03EB,2FED
+libusb,ATxmega64A4U,03EB,2FDD
+libusb,ATxmega128A4U,03EB,2FDE
+libusb,ATxmega64B3,03EB,2FDF
+libusb,ATxmega128B3,03EB,2FE0
+libusb,ATxmega64B1,03EB,2FE1
+libusb,ATxmega128B1,03EB,2FEA
+libusb,ATxmega256A3BU,03EB,2FE2
+libusb,ATxmega16A4U,03EB,2FE3
+libusb,ATxmega32A4U,03EB,2FE4
+libusb,ATxmega64A4U,03EB,2FE5
+libusb,ATxmega128A3U,03EB,2FE6
+libusb,ATxmega192A3U,03EB,2FE7
+libusb,UC3,03EB,2FDC
+libusb,ATUC3,03EB,2FE9
+libusb,AT32UC3C,03EB,2FEB
+libusb,ATxmega256A3U,03EB,2FEC
+libusb,ATmega8U2,03EB,2FEE
+libusb,ATmega16U2,03EB,2FEF
+libusb,ATmega32U2,03EB,2FF0
+libusb,AT32UC3A3,03EB,2FF1
+libusb,ATmega32U6,03EB,2FF2
+libusb,ATmega16U4,03EB,2FF3
+libusb,ATmega32U4,03EB,2FF4
+libusb,AT32UC3B,03EB,2FF6
+libusb,AT90USB82,03EB,2FF7
+libusb,AT32UC3A,03EB,2FF8
+libusb,AT90USB64,03EB,2FF9
+libusb,AT90USB162,03EB,2FFA
+libusb,AT90USB128,03EB,2FFB
+libusb,AT89C5130,03EB,2FFD
+libusb,AT8XC5122,03EB,2FFE
+libusb,AT89C5132,03EB,2FFF
