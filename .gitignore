@@ -23,6 +23,7 @@
 *.user
 .deps
 .libs
+.vs/
 Debug
 INSTALL
 Makefile
