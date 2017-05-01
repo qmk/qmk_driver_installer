@@ -1,0 +1,4 @@
+# The format is
+# driver,desc,vid,pid
+# Use a comma as a separator without spaces
+winusb,Kiibohd DFU Bootloader,1C11,B007
