@@ -1,0 +1,19 @@
+DIRS= \
+     config-interface \
+     enum_descriptors \
+     hot-plug-monitor \
+     load-driver-api \
+     open-device \
+     pipe-policy-other \
+     pipe-policy-timeout \
+     power-policy-suspend \
+     show-device \
+     xfer-async \
+     xfer-async-loop \
+     xfer-control \
+     xfer-control-loop \
+     xfer-iso \
+     xfer-iso-read \
+     xfer-stream \
+     xfer-stream-loop \
+     xfer-sync

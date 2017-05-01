@@ -1,0 +1,197 @@
+LIBUSBK RELEASE NOTES
+
+V3.0.7.0 (04/27/2014)
+==============================================
+- Improved driver error handling.
+
+V3.0.6.15 RC15 (04/13/2014)
+==============================================
+- Fixed hot-plug init issue which caused a failure after re-loading
+  libusbK.dll dynamically. (Reported By Stefan Battmer) 
+
+- Fixed BSOD if a device is removed while changing an interfaces alternate
+  Setting. (Reported By Matt Liberty)
+  
+- Fixed GetCurrentAlternateSetting issues which caused the device to close
+  upon return.
+
+V3.0.6.0 (08/11/2013)
+==============================================
+- Fixed hot-plug deadlock issue
+  - This can occur in GUI application when using the
+    KHOT_FLAG_PLUG_ALL_ON_INIT flag without the 
+	KHOT_FLAG_POST_USER_MESSAGE flag.
+
+- Fixed handle leak when opening devices that are already in-use
+  (WinUSB driver only)
+
+- Fixed hot-plug init issue which caused a failure after re-loading
+  libusbK.dll dynamically. (Reported By Stefan Battmer)  
+
+V3.0.5.16 RC16 (07/03/2012)
+==============================================
+- Fixed BSOD! IRQL_NOT_LESS_OR_EQUAL in wdf01000.sys.
+  - This occurs when bulk/interrupt pipe transfers with RAW_IO
+    disabled(default) are pending and the system attempts to enter
+	stand-by. Reported by Ekkehard Domning, Peter Wang, JamesO.
+
+- Fixed Potential BSOD! IRQL_NOT_LESS_OR_EQUAL in wdf01000.sys.
+  - This may sparatically occur with ISO transfers.
+
+- Added power broadcast functionality to HotK.  This allows applications
+  to receive system suspend/resume notifications.
+
+- Updated queue suspend/resume routines to be more compatible with WinUSB.
+- Updated behavior of RAW_IO pipe policy in regards to suspend/resume.
+  Updated behavior of ISO transfers in regards to suspend/resume.
+  - ISO/RAW_IO transfers no longer implement queue stop/resume
+    functionality. This means flying transfers will prevent the system
+	from entering standby until they complete, timeout, or the
+	*application* cancels them. 
+  
+- Fixed InfWizard wide char/muti-byte conversions.
+
+- Fixed 'WdfDeviceInitFree' not being called when 'WdfDeviceCreate'
+  succeeds and 'Device_OnAdd' ultimately fails.
+
+V3.0.5.13 RC13 (05/11/2012)
+==============================================
+- Fixed OvlK memory allocation issue. Reported by Peter Wang. 
+
+V3.0.5.12 RC12 (04/28/2012)
+==============================================
+- Fixed internal descriptor parsing issue for devices with multiple 
+  interfaces. Reported by Peter Wang. 
+
+- Fixed driver package installation issue when installing multiple .inf 
+  files. Reported By Ekkehard Domning. 
+
+- Added support for Windows 8 Consumer Preview.
+
+- Added library init/free functions with user assignable dynamic heap.
+  - New LibK_Context_Init function.
+  - New LibK_Context_Free function.
+
+- New 'lusbk_dynapi.c' for dynamic loading of libusbK apis in C/C++.
+
+V3.0.5.10 RC10 (03/08/2012)
+==============================================
+- New 'LibK_SetDefaultContext' function.
+
+- New 'LibK_GetDefaultContext' function.
+
+- New 'OvlK_WaitOldest' function.
+
+- Fixed missing 'HotK_FreeAll' function export.
+
+- Removed OvlK thread safe handlers to improve performance and increase
+  flexibility.
+
+- Eliminated 'StmK_Read' transfer size restrictions. (Partial Transfers)
+
+- Fixed StmK dead-lock issue when calling StmK_Stop()
+
+- Added KSTM_FLAG enum values:
+  - KSTM_FLAG_USE_TIMEOUT = 0x80000000
+  - KSTM_FLAG_NO_PARTIAL_XFERS = 0x00100000
+  - KSTM_FLAG_TIMEOUT_MASK = 0x0001FFFF
+ 
+- GLOBAL HEADER TYPE CHANGE: LONGs to INTs
+  - All LONG, PLONG, ULONG, PULONG, and LPDWORD data types were changed 
+    to the equivalent INT, UINT representation. 
+
+- PULIC _KISO_CONTEXT typedef changed.
+  Inserted:
+  - UINT UrbHdrStatus;
+  
+- PULIC KSTM_INFO typedef changed.
+  Added:
+  - KSTM_HANDLE StreamHandle;
+  - PVOID UserState;
+  
+- PULIC KSTM_ERROR_CB signature changed.
+  Old:
+  - typedef INT KUSB_API KSTM_ERROR_CB(_in PKSTM_INFO StreamInfo, _in PKSTM_XFER_CONTEXT XferContext, _in INT ErrorCode);
+  New:
+  - typedef INT KUSB_API KSTM_ERROR_CB(_in PKSTM_INFO StreamInfo, _in PKSTM_XFER_CONTEXT XferContext, _in INT XferContextIndex, _in INT ErrorCode);
+
+- PULIC KSTM_SUBMIT_CB signature changed.
+  Old:
+  - typedef INT KUSB_API KSTM_SUBMIT_CB(_in PKSTM_INFO StreamInfo, _in PKSTM_XFER_CONTEXT XferContext, _in LPOVERLAPPED Overlapped);
+  New:
+  - typedef INT KUSB_API KSTM_SUBMIT_CB(_in PKSTM_INFO StreamInfo, _in PKSTM_XFER_CONTEXT XferContext, _in INT XferContextIndex, _in LPOVERLAPPED Overlapped);
+
+- PULIC KSTM_COMPLETE_CB signature changed.
+  Old:
+  - typedef INT KUSB_API KSTM_COMPLETE_CB(_in PKSTM_INFO StreamInfo, _in PKSTM_XFER_CONTEXT XferContext, _in INT ErrorCode);
+  New:
+  - typedef INT KUSB_API KSTM_COMPLETE_CB(_in PKSTM_INFO StreamInfo, _in PKSTM_XFER_CONTEXT XferContext, _in INT XferContextIndex, _in INT ErrorCode);
+
+- PULIC KSTM_BEFORE_COMPLETE_CB signature changed.
+  Old:
+  - typedef KSTM_COMPLETE_RESULT KUSB_API KSTM_BEFORE_COMPLETE_CB(_in PKSTM_INFO StreamInfo, _in PKSTM_XFER_CONTEXT XferContext, _in PLONG ErrorCode);
+  New:  
+  - typedef KSTM_COMPLETE_RESULT KUSB_API KSTM_BEFORE_COMPLETE_CB(_in PKSTM_INFO StreamInfo, _in PKSTM_XFER_CONTEXT XferContext, _in INT XferContextIndex, _in PLONG ErrorCode);
+
+V3.0.5.5 RC5 (02/09/2012)
+==============================================
+- Fixed driver memory access violation when setting power policies.
+
+- Fixed driver error handling for failed pipe policy requests.
+
+- Added power management options page to InfWizard. This page allows 
+  developers to easily configure default power management options for a 
+  usb device. Options include the ability to suspend a device after it 
+  idles for a specified amount of time or allow a device to wake the 
+  system from a sleeping state. 
+
+- Re-designed power-policy-suspend example.
+
+V3.0.5.4 RC4 (02/04/2012)
+==============================================
+- Fixed kBench msvcrt issue on Windows XP.
+
+- Fixed replace file warning prompt in client installers.
+
+- Fixed an issue with dev-kit setup which prevented it from updating
+  libusbK-inf-wizard.exe
+ 
+V3.0.5.3 RC3 (02/03/2012)
+==============================================
+- New! Client install creator feature for InfWizard.
+
+- Fixed an issue with the libusbK .inf template that prevented it from
+  updating the WDF runtimes on amd64 platforms.  If this happens the
+  installation will fail with a Code 39.
+
+- Added LstK_InitEx() function with device filtering options.
+
+- Changed structure name KHOT_PATTERN_MATCH to KLST_PATTERN_MATCH.
+
+- Added Pascal binding created by Ekkehard Domning.
+
+- Added additional constants, enums, and class function overloads to 
+  .NET bindings. 
+
+- Added InfWizard elevated permissions mainfest.
+
+- Updated InfWizard libwdi components. (v1.2.1 modified) The modified
+  lidwdi source code is available in the src package.
+
+- Fixed OvlK_Wait dead-lock issue when waiting on IO that was never 
+  submitted and the cancel on timeout wait flag is set. 
+
+- Fixed driver issue causing the system to become unstable after 
+  receiving an IO request to an invalid endpoint.
+
+
+V3.0.5.1 RC1 (12/03/2011)
+==============================================
+- Fixed ISO packet USBD status; High word is ORed with low word to 
+  create the 16bit packet status. 
+
+- Added BeforeComplete() stream (StmK) callback function. BeforeComplete() 
+  is executed after a transfer completes but before it is accepted by the 
+  stream. 
+
+- New! MFC based InfWizard.
