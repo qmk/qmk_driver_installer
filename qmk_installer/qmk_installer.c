@@ -55,6 +55,8 @@ int __cdecl main(int argc, char** argv) {
         struct wdi_options_prepare_driver opd = { 0 };
         struct wdi_options_install_driver oid = { 0 };
         struct wdi_options_install_cert oic = { 0 };
+        char original_line[sizeof(line)];
+        strcpy(original_line, line);
         BOOL matching_device_found;
         int r;
         char *inf_name = INF_NAME;
@@ -74,28 +76,35 @@ int __cdecl main(int argc, char** argv) {
             opd.driver_type = WDI_LIBUSBK;
         } else { 
             oprintf("Invalid driver type \"%s\"\n", driver_type);
-            oprintf("On the line:\n%s\n", line);
+            oprintf("On the line:\n%s\n", original_line);
             return 1;
         }
 
         char* desc = strtok(NULL, delimiters);
         if (!desc) {
             oprintf("Description missing\n");
-            oprintf("On the line:\n%s\n", line);
+            oprintf("On the line:\n%s\n", original_line);
             return 1;
         }
         oprintf("Description %s\n", desc);
         char* str_vid = strtok(NULL, delimiters);
         if (!str_vid) {
             oprintf("vid missing\n");
-            oprintf("On the line:\n%s\n", line);
+            oprintf("On the line:\n%s\n", original_line);
             return 1;
         }
 
         char* str_pid = strtok(NULL, delimiters);
         if (!str_pid) {
             oprintf("pid missing\n");
-            oprintf("On the line:\n%s\n", line);
+            oprintf("On the line:\n%s\n", original_line);
+            return 1;
+        }
+        
+        char* guid = strtok(NULL, delimiters);
+        if (!guid) {
+            oprintf("guid missing\n");
+            oprintf("On the line:\n%s\n", original_line);
             return 1;
         }
 
@@ -105,6 +114,7 @@ int __cdecl main(int argc, char** argv) {
         dev.vid = vid;
         dev.pid = pid;
         dev.desc = desc;
+        opd.device_guid = guid;
 
         oprintf("Extracting driver files for %s...\n", desc);
         r = wdi_prepare_driver(&dev, ext_dir, inf_name, &opd);
