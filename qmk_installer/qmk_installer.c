@@ -36,7 +36,8 @@
 
 int __cdecl main(int argc, char** argv) {
 
-    static int opt_silent = 0, opt_extract = 0, log_level = WDI_LOG_LEVEL_WARNING;
+    int log_level = WDI_LOG_LEVEL_WARNING;
+    int opt_silent = 0, opt_extract = 0;
     wdi_set_log_level(log_level);
     FILE* file = fopen("drivers.txt", "r");
     if (!file) {
@@ -49,12 +50,12 @@ int __cdecl main(int argc, char** argv) {
         if (line[0] == '#')
             continue;
 
-        static struct wdi_device_info *ldev, dev = { NULL, 0, 0, FALSE, 0, "", NULL, NULL, NULL };
-        static struct wdi_options_create_list ocl = { 0 };
-        static struct wdi_options_prepare_driver opd = { 0 };
-        static struct wdi_options_install_driver oid = { 0 };
-        static struct wdi_options_install_cert oic = { 0 };
-        static BOOL matching_device_found;
+        struct wdi_device_info *ldev, dev = { NULL, 0, 0, FALSE, 0, "", NULL, NULL, NULL };
+        struct wdi_options_create_list ocl = { 0 };
+        struct wdi_options_prepare_driver opd = { 0 };
+        struct wdi_options_install_driver oid = { 0 };
+        struct wdi_options_install_cert oic = { 0 };
+        BOOL matching_device_found;
         int r;
         char *inf_name = INF_NAME;
         char *ext_dir = DEFAULT_DIR;
