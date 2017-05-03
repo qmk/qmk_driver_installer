@@ -1701,6 +1701,13 @@ out:
 	DestroyWindow(find_security_prompt());
 	current_device = NULL;
 	safe_free(buffer);
+    if (handle[1] != INVALID_HANDLE_VALUE) {
+        if (WaitForSingleObject(handle[1], 2000) == WAIT_TIMEOUT) {
+			wdi_err("installer failed to shut down - terminating");
+            TerminateProcess(handle[1], 0);
+            WaitForSingleObject(handle[1], INFINITE);
+        }
+    }
 	safe_closehandle(handle[2]);
 	safe_closehandle(handle[1]);
 	safe_closehandle(handle[0]);
