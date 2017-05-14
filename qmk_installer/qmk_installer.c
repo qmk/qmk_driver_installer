@@ -86,7 +86,7 @@ int __cdecl main(int argc, char** argv) {
             oprintf("On the line:\n%s\n", original_line);
             return 1;
         }
-        oprintf("Description %s\n", desc);
+
         char* str_vid = strtok(NULL, delimiters);
         if (!str_vid) {
             oprintf("vid missing\n");
