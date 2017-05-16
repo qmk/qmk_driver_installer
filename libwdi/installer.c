@@ -61,6 +61,8 @@
 #define WU_E_WU_DISABLED                  0x8024002E
 #define WU_S_ALREADY_INSTALLED            0x00240006
 
+// #define ENABLE_SYSLOG_READER
+
 /*
  * Cfgmgr32.dll interface
  */
@@ -83,8 +85,10 @@ PF_TYPE_DECL(CDECL, int, __wgetmainargs, (int*, wchar_t***, wchar_t***, int, int
  * Globals
  */
 HANDLE pipe_handle = INVALID_HANDLE_VALUE;
+#ifdef ENABLE_SYSLOG_READER
 HANDLE syslog_ready_event = INVALID_HANDLE_VALUE;
 HANDLE syslog_terminate_event = INVALID_HANDLE_VALUE;
+#endif
 PSID user_psid = NULL;
 
 // Log data with parent app through the pipe
@@ -326,6 +330,8 @@ void check_removed(char* device_hardware_id)
 	}
 }
 
+#ifdef ENABLE_SYSLOG_READER
+
 /*
  * Converts a default system locate string to UTF-8
  * (allocate returned string with 1 extra leading byte)
@@ -518,6 +524,8 @@ out:
 	CloseHandle(log_handle);
 	_endthread();
 }
+
+#endif
 
 static char *windows_error_str(uint32_t retval)
 {
@@ -822,6 +830,7 @@ int __cdecl main(int argc_ansi, char** argv_ansi)
 	user_sid = req_id(IC_GET_USER_SID);
 	ConvertStringSidToSidA(user_sid, &user_psid);
 
+#ifdef ENABLE_SYSLOG_READER
 	// Setup the syslog reader thread
 	syslog_ready_event = CreateEvent(NULL, TRUE, FALSE, NULL);
 	syslog_terminate_event = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -833,6 +842,7 @@ int __cdecl main(int argc_ansi, char** argv_ansi)
 		// NB: if you try to close the syslog reader thread handle, you get a
 		// "more recent driver was found" error from UpdateForPnP. Weird...
 	}
+#endif
 
 	// Disable the creation of a restore point
 	disable_system_restore(TRUE);
@@ -886,16 +896,20 @@ out:
 	disable_system_restore(FALSE);
 	// TODO: have libwi send an ACK?
 	Sleep(1000);
+#ifdef ENABLE_SYSLOG_READER
 	SetEvent(syslog_terminate_event);
+#endif
 	if (argv != argv_ansi) {
 		for (i=0; i<argc; i++) {
 			safe_free(argv[i]);
 		}
 		safe_free(argv);
 	}
+#ifdef ENABLE_SYSLOG_READER
 	CloseHandle(syslog_ready_event);
 	CloseHandle(syslog_terminate_event);
 	CloseHandle((HANDLE)syslog_reader_thid);
+#endif
 	CloseHandle(pipe_handle);
 	return ret;
 }
