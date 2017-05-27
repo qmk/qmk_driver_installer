@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include "libwdi.h"
 #include <stdbool.h>
+#include "getopt/getopt.h"
 
 #if defined(_PREFAST_)
 /* Disable "Banned API Usage:" errors when using WDK's OACR/Prefast */
@@ -191,15 +192,51 @@ int install_drivers(bool all, bool force, const char* temp_path) {
     return 0;
 }
 
+void usage(void)
+{
+    printf("Installs USB drivers for the QMK firmware\n");
+	printf("\n");
+    printf("qmk_installer [--force] [--all]\n");
+	printf("--force   forces installation over existing drivers\n");
+	printf("--all     installs drivers for unconnected devices\n");
+	printf("--help    displays this message\n");
+	printf("\n");
+}
+
 int __cdecl main(int argc, char** argv) {
+	// Parse command-line options
+    int all = 0;
+    int force = 0;
+
+    struct option long_options[] = {
+        // These options set a flag.
+        {"force", no_argument, &force, 1},
+        {"all", no_argument, &all, 1},
+        {"help", no_argument, 0, 'h'},
+        {0, 0, 0, 0}
+    };
+
+	while(1)
+	{
+        int option_index;
+		int c = getopt_long(argc, argv, "", long_options, &option_index);
+		//  Detect the end of the options.
+		if (c == -1)
+			break;
+        switch (c) {
+        case 'h':
+        case '?':
+            usage();
+            return 0;
+        default:
+            break;
+        }
+	}
     char temp_path[MAX_PATH];
     GetTempPathA(MAX_PATH, temp_path);
     strcat_s(temp_path, MAX_PATH, "qmk_driver");
 
-    bool all = true;
-    bool force = true;
-
-    int ret = install_drivers(all, force, temp_path);
+    int ret = install_drivers(all != 0, force != 0, temp_path);
 
     oprintf("Cleaning up...\n");
     delete_directory(temp_path);
