@@ -1,6 +1,4 @@
-/*
-* wdi-simple.c: Console Driver Installer for a single USB device
-* Copyright (c) 2010-2016 Pete Batard <pete@akeo.ie>
+/* Copyright 2017 Fred Sundvik
 *
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
