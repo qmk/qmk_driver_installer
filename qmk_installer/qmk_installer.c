@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "libwdi.h"
+#include <stdbool.h>
 
 #if defined(_PREFAST_)
 /* Disable "Banned API Usage:" errors when using WDK's OACR/Prefast */
@@ -32,20 +33,42 @@
 #define oprintf(...) do {if (!opt_silent) printf(__VA_ARGS__);} while(0)
 
 #define INF_NAME    "usb_device.inf"
-#define DEFAULT_DIR "usb_driver"
 
-int __cdecl main(int argc, char** argv) {
+void delete_directory(const char* dir)
+{
+    // The buffer need to be terminated by double zeros
+    char buffer[MAX_PATH + 1];
+    strcpy_s(buffer, MAX_PATH, dir);
+    buffer[strnlen_s(buffer, MAX_PATH) + 1] = 0;
+    SHFILEOPSTRUCT file_op = {
+        NULL,
+        FO_DELETE,
+        buffer,
+        "",
+        FOF_NOCONFIRMATION |
+        FOF_NOERRORUI |
+        FOF_SILENT,
+        false,
+        0,
+    ""
+    };
+    SHFileOperationA(&file_op);
+}
 
+static const int opt_silent = 0;
+
+int install_drivers(const char* temp_path) {
+    char line[1024];
+    const char* delimiters = ",";
     int log_level = WDI_LOG_LEVEL_WARNING;
-    int opt_silent = 0, opt_extract = 0;
+    int opt_extract = 0;
     wdi_set_log_level(log_level);
     FILE* file = fopen("drivers.txt", "r");
     if (!file) {
         oprintf("Could not open drivers.txt\n");
         return 1;
     }
-    char line[1024];
-    const char* delimiters = ",";
+
     while (fgets(line, sizeof(line), file)) {
         if (line[0] == '#')
             continue;
@@ -60,7 +83,7 @@ int __cdecl main(int argc, char** argv) {
         BOOL matching_device_found;
         int r;
         char *inf_name = INF_NAME;
-        char *ext_dir = DEFAULT_DIR;
+        char *ext_dir = temp_path;
         char *cert_name = NULL;
 
         ocl.list_all = TRUE;
@@ -129,6 +152,7 @@ int __cdecl main(int argc, char** argv) {
         }
 
         oprintf("Installing driver for %s...\n", desc);
+        oprintf("  This can take a while, please, don't close this window!\n");
 
         // Try to match against a plugged device to avoid device manager prompts
         matching_device_found = FALSE;
@@ -154,4 +178,17 @@ int __cdecl main(int argc, char** argv) {
         }
     }
     return 0;
+}
+
+int __cdecl main(int argc, char** argv) {
+    char temp_path[MAX_PATH];
+    GetTempPathA(MAX_PATH, temp_path);
+    strcat_s(temp_path, MAX_PATH, "qmk_driver");
+
+    int ret = install_drivers(temp_path);
+
+    oprintf("Cleaning up...\n");
+    delete_directory(temp_path);
+
+    return ret;
 }
