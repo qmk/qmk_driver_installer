@@ -58,15 +58,15 @@ void delete_directory(const char* dir)
 
 static const int opt_silent = 0;
 
-int install_drivers(bool all, bool force, const char* temp_path) {
+int install_drivers(bool all, bool force, const char* driver_list, const char* temp_path) {
     char line[1024];
     const char* delimiters = ",";
     int log_level = WDI_LOG_LEVEL_WARNING;
     int opt_extract = 0;
     wdi_set_log_level(log_level);
-    FILE* file = fopen("drivers.txt", "r");
+    FILE* file = fopen(driver_list, "r");
     if (!file) {
-        oprintf("Could not open drivers.txt\n");
+        oprintf("Could not open %s\n", driver_list);
         return 1;
     }
 
@@ -196,10 +196,11 @@ void usage(void)
 {
     printf("Installs USB drivers for the QMK firmware\n");
 	printf("\n");
-    printf("qmk_installer [--force] [--all]\n");
-	printf("--force   forces installation over existing drivers\n");
-	printf("--all     installs drivers for unconnected devices\n");
-	printf("--help    displays this message\n");
+    printf("qmk_installer [--force] [--all] drivers_list\n");
+	printf("--force         forces installation over existing drivers\n");
+	printf("--all           installs drivers for unconnected devices\n");
+	printf("--help          displays this message\n");
+    printf("drivers_list    path to a file with a list of drivers to install\n");
 	printf("\n");
 }
 
@@ -227,16 +228,24 @@ int __cdecl main(int argc, char** argv) {
         case 'h':
         case '?':
             usage();
-            return 0;
+            return 1;
         default:
             break;
         }
 	}
+    const char* driver_list;
+    if (optind == argc)
+    {
+        usage();
+        printf("Error: Missing driver list file\n");
+        return 1;
+    }
+    driver_list = argv[optind];
     char temp_path[MAX_PATH];
     GetTempPathA(MAX_PATH, temp_path);
     strcat_s(temp_path, MAX_PATH, "qmk_driver");
 
-    int ret = install_drivers(all != 0, force != 0, temp_path);
+    int ret = install_drivers(all != 0, force != 0, driver_list, temp_path);
 
     oprintf("Cleaning up...\n");
     delete_directory(temp_path);
