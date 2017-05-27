@@ -57,7 +57,7 @@ void delete_directory(const char* dir)
 
 static const int opt_silent = 0;
 
-int install_drivers(const char* temp_path) {
+int install_drivers(bool all, bool force, const char* temp_path) {
     char line[1024];
     const char* delimiters = ",";
     int log_level = WDI_LOG_LEVEL_WARNING;
@@ -139,20 +139,21 @@ int install_drivers(const char* temp_path) {
         dev.desc = desc;
         opd.device_guid = guid;
 
-        oprintf("Extracting driver files for %s...\n", desc);
+        oprintf("%s\n", desc);
+        oprintf("  Extracting driver files...\n", desc);
         r = wdi_prepare_driver(&dev, ext_dir, inf_name, &opd);
-        oprintf("  %s\n", wdi_strerror(r));
+        oprintf("    %s\n", wdi_strerror(r));
         if ((r != WDI_SUCCESS) || (opt_extract))
             return r;
 
         if (cert_name != NULL) {
-            oprintf("Installing certificate '%s' as a Trusted Publisher...\n", cert_name);
+            oprintf("  Installing certificate '%s' as a Trusted Publisher...\n", cert_name);
             r = wdi_install_trusted_certificate(cert_name, &oic);
-            oprintf("  %s\n", wdi_strerror(r));
+            oprintf("    %s\n", wdi_strerror(r));
         }
 
-        oprintf("Installing driver for %s...\n", desc);
-        oprintf("  This can take a while, please, don't close this window!\n");
+        oprintf("  Installing driver...\n", desc);
+        oprintf("    This can take a while, please, don't close this window!\n");
 
         // Try to match against a plugged device to avoid device manager prompts
         matching_device_found = FALSE;
@@ -160,21 +161,31 @@ int install_drivers(const char* temp_path) {
             r = WDI_SUCCESS;
             for (; (ldev != NULL) && (r == WDI_SUCCESS); ldev = ldev->next) {
                 if ((ldev->vid == dev.vid) && (ldev->pid == dev.pid) && (ldev->mi == dev.mi)) {
-                    dev.hardware_id = ldev->hardware_id;
-                    dev.device_id = ldev->device_id;
                     matching_device_found = TRUE;
-                    oprintf("  %s: ", dev.hardware_id);
+                    oprintf("    %s: ", ldev->hardware_id);
                     fflush(stdout);
-                    r = wdi_install_driver(&dev, ext_dir, inf_name, &oid);
-                    oprintf("%s\n", wdi_strerror(r));
+                    if (ldev->driver == "" || force) {
+                        dev.hardware_id = ldev->hardware_id;
+                        dev.device_id = ldev->device_id;
+                        r = wdi_install_driver(&dev, ext_dir, inf_name, &oid);
+                        oprintf("%s\n", wdi_strerror(r));
+                    }
+                    else {
+                        oprintf("existing driver found, skipping.\n");
+                    }
                 }
             }
         }
 
         // No plugged USB device matches this one -> install driver
         if (!matching_device_found) {
-            r = wdi_install_driver(&dev, ext_dir, inf_name, &oid);
-            oprintf("  %s\n", wdi_strerror(r));
+            if (all) {
+                r = wdi_install_driver(&dev, ext_dir, inf_name, &oid);
+                oprintf("    %s\n", wdi_strerror(r));
+            } 
+            else {
+                oprintf("    No matching device found\n");
+            }
         }
     }
     return 0;
@@ -185,7 +196,10 @@ int __cdecl main(int argc, char** argv) {
     GetTempPathA(MAX_PATH, temp_path);
     strcat_s(temp_path, MAX_PATH, "qmk_driver");
 
-    int ret = install_drivers(temp_path);
+    bool all = true;
+    bool force = true;
+
+    int ret = install_drivers(all, force, temp_path);
 
     oprintf("Cleaning up...\n");
     delete_directory(temp_path);
