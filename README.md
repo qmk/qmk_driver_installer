@@ -1,8 +1,32 @@
-qmk_installer: An Windows Driver Installation library for qmk_supported USB devices
+qmk_installer: An Windows Driver Installation library for QMK supported USB devices
 ===================================================================================
-Based on libwdi. The library is in fact a fork of libwdi, but adds some new executables and configuration files for qmk_supported devices.
+Based on libwdi. The library is in fact a fork of libwdi, but adds some new executables and configuration files for QMK supported devices.
 
 It can be compiled by Visual Studio 2017, read the [libwdi instructions](https://github.com/pbatard/libwdi/wiki/Compiling-and-debugging-libwdi-or-Zadig) for further details.
+
+By default it installs drivers only for connected devices, which need to be in bootloader(flashing) mode. If you specify the --all option it will install drivers for unconnected devices too. It doesn't override any existing drivers, but that can be forced by the --force option.
+
+**Usage:**
+```
+qmk_installer [--force] [--all] drivers_list
+--force         forces installation over existing drivers
+--all           installs drivers for unconnected devices
+--help          displays this message
+drivers_list    path to a file with a list of drivers to install
+```
+
+The drivers_list is a file with the following format
+```
+# The format is
+# driver,desc,vid,pid,guid
+# Use a comma as a separator without spaces
+# Driver can be one of winusb,libusb,libusbk
+# Use Windows Powershell and type [guid]::NewGuid() to generate guids
+winusb,Kiibohd DFU Bootloader,1C11,B007,aa5a3f86-b81e-4416-89ad-0c1ea1ed63af
+libusb,ATxmega16C4,03EB,2FD8,23266ee7-5423-4cc4-993b-034571c43a90
+libusb,ATxmega32C4,03EB,2FD9,d4b62886-2ac8-4534-aa24-eae0a2c3ce43
+libusb,ATxmega64C3,03EB,2FD6,08467ca7-9b5a-41d2-8d8a-4a26d0b5285b
+```
 
 libwdi: A Windows Driver Installation library for USB devices
 =============================================================
