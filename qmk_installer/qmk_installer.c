@@ -194,8 +194,15 @@ int install_drivers(bool all, bool force, const char* driver_list, const char* t
 
 void usage(void)
 {
-    printf("Installs USB drivers for the QMK firmware\n");
+    printf("Installs USB drivers for the QMK firmware\n\n");
+
+    printf("By default it installs drivers only for connected devices, which\n");
+    printf("need to be in bootloader(flashing) mode. If you specify the --all\n");
+    printf("option it will install drivers for unconnected devices too. It doesn't\n");
+    printf("override any existing drivers, but that can be forced by the --force\n");
+    printf("option.\n");
 	printf("\n");
+
     printf("qmk_installer [--force] [--all] drivers_list\n");
 	printf("--force         forces installation over existing drivers\n");
 	printf("--all           installs drivers for unconnected devices\n");
