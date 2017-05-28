@@ -26,7 +26,7 @@
 #include "tokenizer.h"
 
 // Initial timeout delay to wait for the installer to run
-#define DEFAULT_TIMEOUT 10000
+#define DEFAULT_TIMEOUT 30000
 #define PF_ERR          wdi_err
 
 // These warnings are taken care of in configure for other platforms
