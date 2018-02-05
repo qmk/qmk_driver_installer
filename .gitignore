@@ -50,3 +50,5 @@ ltmain.sh
 missing
 sources
 stamp-h1
+qmk_installer/drivers.txt
+qmk_installer/qmk_driver_installer.zip
